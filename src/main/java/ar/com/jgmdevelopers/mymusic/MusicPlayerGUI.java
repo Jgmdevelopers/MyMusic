@@ -4,16 +4,10 @@
  */
 package ar.com.jgmdevelopers.mymusic;
 
-import ar.com.jgmdevelopers.mymusic.model.MusicPlayer;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.advanced.AdvancedPlayer;
+import javax.swing.Timer;
 
 /**
  *
@@ -22,9 +16,11 @@ import javazoom.jl.player.advanced.AdvancedPlayer;
 public class MusicPlayerGUI extends javax.swing.JFrame {
 
     private MusicPlayer musicPlayer = new MusicPlayer();
+
     
     public MusicPlayerGUI() {
         initComponents();
+         musicPlayer = new MusicPlayer();
     }
 
     /**
@@ -43,6 +39,8 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         songLabel = new javax.swing.JLabel();
         pauseButton = new javax.swing.JButton();
         stateButton = new javax.swing.JButton();
+        currentTimeLabel = new javax.swing.JLabel();
+        totalTimeLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -85,38 +83,51 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
             }
         });
 
+        currentTimeLabel.setText("Tiempo actual: 0 s");
+
+        totalTimeLabel.setText("Duración total: 0 s");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(songLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(playButton)
                         .addGap(18, 18, 18)
                         .addComponent(pauseButton)
                         .addGap(18, 18, 18)
-                        .addComponent(stopButton)))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(stopButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 288, Short.MAX_VALUE)
+                        .addComponent(loadButton))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
-                        .addComponent(loadButton)
-                        .addContainerGap())
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(songLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 369, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(stateButton)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(currentTimeLabel)
+                            .addComponent(totalTimeLabel))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(stateButton)
+                .addGap(18, 18, 18))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(songLabel)
-                    .addComponent(stateButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(stateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(117, 117, 117)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(songLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(currentTimeLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(totalTimeLabel)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 137, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(playButton)
                     .addComponent(stopButton)
@@ -161,22 +172,34 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         int returnValue = fileChooser.showOpenDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File musicFile = fileChooser.getSelectedFile();
-
+            
             // Detener la reproducción actual antes de cargar el nuevo archivo
             musicPlayer.stopMusic();
 
-            // Cargar y reproducir el nuevo archivo
             musicPlayer.loadMusic(musicFile);
-            musicPlayer.playMusic();
 
             // Actualizar la etiqueta de la canción cargada
             songLabel.setText("Cargado: " + musicFile.getName()); 
-            JOptionPane.showMessageDialog(this, "Archivo cargado: " + musicFile.getName());
-        }
+                // Mostrar información detallada del archivo
+            String message = "Archivo cargado: " + musicFile.getName() + "\n"
+                           + "Tamaño del archivo: " + musicPlayer.getFileSize() + "\n"
+                           + "Duración: " + musicPlayer.getFormattedTotalTime()+ " segundos\n"
+                           + "Bitrate: " + musicPlayer.getBitrate() + "\n"
+                           + "Frecuencia de muestreo: " + musicPlayer.getSampleRate();
+            JOptionPane.showMessageDialog(this, message);
+             totalTimeLabel.setText("Duración total: " + musicPlayer.getFormattedTotalTime() + " s");
+            }
+        
     }//GEN-LAST:event_loadButtonActionPerformed
 
     private void stateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stateButtonActionPerformed
-        // TODO add your handling code here:
+        // Obtener el tiempo actual y la duración total de la canción desde el MusicPlayer
+        int currentTime = musicPlayer.getCurrentPlaybackTime();
+        int totalTime = musicPlayer.getTotalTimeInSeconds();
+
+        // Actualizar las etiquetas de tiempo actual y duración total
+        currentTimeLabel.setText("Tiempo actual: " + currentTime + " s");
+       
     }//GEN-LAST:event_stateButtonActionPerformed
 
     private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pauseButtonActionPerformed
@@ -223,6 +246,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel currentTimeLabel;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton loadButton;
     private javax.swing.JButton pauseButton;
@@ -230,7 +254,9 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private javax.swing.JLabel songLabel;
     private javax.swing.JButton stateButton;
     private javax.swing.JButton stopButton;
+    private javax.swing.JLabel totalTimeLabel;
     // End of variables declaration//GEN-END:variables
 
-  
+   
+ 
 }
