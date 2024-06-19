@@ -1,9 +1,12 @@
 package ar.com.jgmdevelopers.mymusic;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.BitstreamException;
 import javazoom.jl.decoder.JavaLayerException;
@@ -23,7 +26,8 @@ public class MusicPlayer {
     private int currentTimeInSeconds = 0;  
     private int totalTimeInSeconds = 0;     
     private String bitrate;
-    private String sampleRate;  
+    private String sampleRate; 
+     private Timer timer;
     
      public MusicPlayer() {
         this.musicFile = null;
@@ -37,6 +41,18 @@ public class MusicPlayer {
         this.totalTimeInSeconds = 0;
         this.bitrate = "";
         this.sampleRate = "";
+        
+         // Initialize the timer
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (isPlaying && !isPaused) {
+                    currentTimeInSeconds++;
+                    updatePlaybackTime(currentTimeInSeconds, totalTimeInSeconds);
+                }
+            }
+        });
+       
     }
 
     public void loadMusic(File file) {
@@ -85,6 +101,10 @@ public class MusicPlayer {
         } else {
             startPlayer(pausedOnFrame);
         }
+           // Start the timer when music starts playing
+        if (!timer.isRunning()) {
+            timer.start();
+        }
     }
 
     private void startPlayer(int startFrame) {
@@ -118,6 +138,9 @@ public class MusicPlayer {
                 e.printStackTrace();
             } finally {
                 isPlaying = false;
+                if (timer.isRunning()) {
+                    timer.stop();
+                }
             }
         });
         playerThread.start();
@@ -127,15 +150,24 @@ public class MusicPlayer {
         if (player != null && isPlaying && !isPaused) {
             isPaused = true;
             player.close();
+            // Stop the timer when music is paused
+            if (timer.isRunning()) {
+                timer.stop();
+            }
         }
     }
 
     public void stopMusic() {
         if (player != null && isPlaying) {
-            player.close();
+             player.close();
             isPlaying = false;
             isPaused = false;
             pausedOnFrame = 0;
+            currentTimeInSeconds = 0;
+            // Stop the timer when music stops
+            if (timer.isRunning()) {
+                timer.stop();
+            }
         }
     }
 
@@ -160,7 +192,7 @@ public class MusicPlayer {
         return sampleRate;
     }
     
-    private String formatTime(int seconds) {
+    String formatTime(int seconds) {
         int hours = seconds / 3600;
         int minutes = (seconds % 3600) / 60;
         int secs = seconds % 60;

@@ -4,6 +4,8 @@
  */
 package ar.com.jgmdevelopers.mymusic;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -100,7 +102,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                         .addComponent(pauseButton)
                         .addGap(18, 18, 18)
                         .addComponent(stopButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 288, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 251, Short.MAX_VALUE)
                         .addComponent(loadButton))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(songLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 369, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -156,6 +158,17 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
             musicPlayer.playMusic();
             songLabel.setText("Reproduciendo: " + musicPlayer.getMusicFileName());
             stateButton.setText("Reproduciendo");
+            
+            //Creo un timer para actualizar el currentimelabel cada segundo
+            Timer updateCurrentTimeLabelTimer = new Timer (1000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String formattedCurrentTime = musicPlayer.formatTime(musicPlayer.getCurrentPlaybackTime());
+                    currentTimeLabel.setText("Tiempo actual: " + formattedCurrentTime);
+                }
+            });
+             // Actualizar las etiquetas de tiempo actual y duración total
+             updateCurrentTimeLabelTimer.start();
         } else {
             JOptionPane.showMessageDialog(this, "Por favor, cargue un archivo primero.");
         }
@@ -195,11 +208,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private void stateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stateButtonActionPerformed
         // Obtener el tiempo actual y la duración total de la canción desde el MusicPlayer
         int currentTime = musicPlayer.getCurrentPlaybackTime();
-        int totalTime = musicPlayer.getTotalTimeInSeconds();
-
-        // Actualizar las etiquetas de tiempo actual y duración total
-        currentTimeLabel.setText("Tiempo actual: " + currentTime + " s");
-       
+        int totalTime = musicPlayer.getTotalTimeInSeconds();  
     }//GEN-LAST:event_stateButtonActionPerformed
 
     private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pauseButtonActionPerformed
