@@ -27,7 +27,8 @@ public class MusicPlayer {
     private int totalTimeInSeconds = 0;     
     private String bitrate;
     private String sampleRate; 
-     private Timer timer;
+    private Timer timer;
+    private int currentFrame = 0;
     
      public MusicPlayer() {
         this.musicFile = null;
@@ -87,54 +88,81 @@ public class MusicPlayer {
       }
   }
 
-    public void playMusic() {
-        if (musicFile == null) {
-            throw new IllegalStateException("No music file loaded");
-        }
-        if (playerThread != null && playerThread.isAlive()) {
-            if (isPaused) {
-                synchronized (this) {
-                    isPaused = false;
-                    this.notifyAll();
-                }
-            }
-        } else {
-            startPlayer(pausedOnFrame);
-        }
-           // Start the timer when music starts playing
-        if (!timer.isRunning()) {
-            timer.start();
-        }
+  public void playMusic() {
+    System.out.println("*************************");
+    System.out.println("Entrando en playMusic()");
+    System.out.println("Estado inicial: ");
+    System.out.println("  isPlaying: " + isPlaying);
+    System.out.println("  isPaused: " + isPaused);
+    System.out.println("  currentFrame : " + currentFrame);
+    System.out.println("  playerThread: " + playerThread);
+    System.out.println("  pausedOnFrame : " + pausedOnFrame);
+    System.out.println("  playerThread.isAlive(): " + (playerThread != null && playerThread.isAlive()));
+    
+    // Comprueba si no hay un archivo de música cargado
+    if (musicFile == null) {
+        throw new IllegalStateException("No music file loaded");
     }
+    
+    // Comprueba si el hilo del reproductor ya está activo y reproduciendo
+    if (playerThread != null || isPaused) {
+        System.out.println("Reanudando la reproducción desde la pausa.");
+        // Si la música está en pausa
+        if (isPaused) {
+            synchronized (this) {
+                isPaused = false;
+                 System.out.println("pausa vuelve a falso");
+                 startPlayer(pausedOnFrame);
+                // Notifica a cualquier hilo en espera (esto reanuda la reproducción)
+                this.notifyAll();
+               }
+        } else {
+            System.out.println("La música ya está reproduciendo.");
+        }
+    } else {
+        System.out.println("Iniciando un nuevo hilo de reproducción.");
+        startPlayer(pausedOnFrame);
+    }
+    // Iniciar el temporizador cuando la música comienza a reproducirse
+    if (!timer.isRunning()) {
+        System.out.println("Inicia el temporizador"); // Imprimir mensaje de depuración
+        timer.start();
+    }
+}
 
-    private void startPlayer(int startFrame) {
+ private void startPlayer(int startFrame) {
+    System.out.println("*************************");
+    System.out.println("Entrando en startMusic()");
+    System.out.println("Estado inicial: ");
+    System.out.println("  isPlaying: " + isPlaying);
+    System.out.println("  isPaused: " + isPaused);
+    System.out.println("  player : " + player);
+    System.out.println("  currentFrame : " + currentFrame);
+    System.out.println("  startFrame: " + startFrame);
+    System.out.println("  playerThread: " + playerThread);
+    System.out.println("  playerThread.isAlive(): " + (playerThread != null && playerThread.isAlive()));
+    
         playerThread = new Thread(() -> {
+            
             try (FileInputStream fileInputStream = new FileInputStream(musicFile)) {
+                
                 player = new AdvancedPlayer(fileInputStream);
+                //currentFrame = startFrame; // Inicia desde el punto de pausa
+                isPlaying = true;
+                
+                //player.play(startFrame, totalFrames);
                 player.setPlayBackListener(new PlaybackListener() {
                     @Override
                     public void playbackFinished(PlaybackEvent evt) {
-                        pausedOnFrame = evt.getFrame(); 
-                        if (!isPaused) {
-                            currentTimeInSeconds = 0; 
-                        }
+                        currentFrame = evt.getFrame(); 
+                        pausedOnFrame = currentFrame;
+                        System.out.println("Inicia el evento de escucha" + pausedOnFrame); // Imprimir mensaje de depuración
                     }
                 });
-                isPlaying = true;
-                player.play(startFrame, totalFrames);
 
-                int currentFrame = startFrame;
-                while (isPlaying && currentFrame < totalFrames) {
-                    if (!isPaused) {
-                        currentTimeInSeconds = (currentFrame * 1000) / 44100; 
-
-                        SwingUtilities.invokeLater(() -> updatePlaybackTime(currentTimeInSeconds, totalTimeInSeconds));
-
-                        Thread.sleep(500);
-                        currentFrame += 100; 
-                    }
-                }
-            } catch (JavaLayerException | IOException | InterruptedException e) {
+                   player.play(startFrame, Integer.MAX_VALUE);
+           
+            } catch (JavaLayerException | IOException e) {
                 e.printStackTrace();
             } finally {
                 isPlaying = false;
@@ -143,28 +171,151 @@ public class MusicPlayer {
                 }
             }
         });
+        // Variable para llevar el conteo de frames reproducidos
         playerThread.start();
     }
 
-    public void pauseMusic() {
-        if (player != null && isPlaying && !isPaused) {
-            isPaused = true;
-            player.close();
-            // Stop the timer when music is paused
-            if (timer.isRunning()) {
-                timer.stop();
-            }
-        }
-    }
+ public void resumeMusic() {
+    System.out.println("*************************");
+    System.out.println("Entrando en resumeMusic()");
+    System.out.println("Estado inicial: ");
+    System.out.println("  isPlaying: " + isPlaying);
+    System.out.println("  isPaused: " + isPaused);
+    System.out.println("  player : " + player);
+    System.out.println("  currentFrame : " + currentFrame);
+    System.out.println("  pausedOnFrame : " + pausedOnFrame);
+    System.out.println("  playerThread: " + playerThread);
+    System.out.println("  playerThread.isAlive(): " + (playerThread != null && playerThread.isAlive()));
 
-    public void stopMusic() {
+    if (isPaused) {
+        System.out.println("Reanudando la reproducción desde el frame: " + pausedOnFrame);
+        
+        // Iniciar un nuevo hilo de reproducción
+        startPlayer(pausedOnFrame);
+
+        isPlaying = true;
+        isPaused = false;
+
+        // Reiniciar el temporizador
+        if (!timer.isRunning()) {
+            timer.start();
+        }
+    } else {
+        System.out.println("No hay música en pausa para reanudar.");
+    }
+}
+
+ 
+//public void resumeMusic() {
+//    System.out.println("*************************");
+//    System.out.println("Entrando en resumeMusic()");
+//    System.out.println("Estado inicial: ");
+//    System.out.println("  isPlaying: " + isPlaying);
+//    System.out.println("  isPaused: " + isPaused);
+//    System.out.println("  player : " + player);
+//    System.out.println("  currentFrame : " + currentFrame);
+//    System.out.println("  pausedOnFrame : " + pausedOnFrame);
+//    System.out.println("  playerThread: " + playerThread);
+//    System.out.println("  playerThread.isAlive(): " + (playerThread != null && playerThread.isAlive()));
+//    
+//    if (isPaused) {
+//        System.out.println("Reanudando la reproducción desde el frame: " + pausedOnFrame);
+//        
+//        // Iniciar un nuevo hilo de reproducción
+//        playerThread = new Thread(() -> {
+//            try (FileInputStream fileInputStream = new FileInputStream(musicFile)) {
+//                Bitstream bitstream = new Bitstream(fileInputStream);
+//                player = new AdvancedPlayer(fileInputStream);
+//                
+//                // Saltar los frames hasta el punto de pausa
+//                for (int i = 0; i < pausedOnFrame; i++) {
+//                    bitstream.readFrame();
+//                }
+//
+//                // Iniciar la reproducción desde el frame pausado
+//                player.play(pausedOnFrame, totalFrames);
+//                
+//                // Listener para actualizar el frame actual
+//                player.setPlayBackListener(new PlaybackListener() {
+//                    @Override
+//                    public void playbackFinished(PlaybackEvent evt) {
+//                        pausedOnFrame = evt.getFrame();
+//                          currentFrame = pausedOnFrame;
+//                        System.out.println("Frame actual actualizado a: " + pausedOnFrame);
+//                    }
+//                });
+//
+//            } catch (JavaLayerException | IOException e) {
+//                e.printStackTrace();
+//            } finally {
+//                isPlaying = false;
+//                isPaused = false;
+//                if (timer.isRunning()) {
+//                    timer.stop();
+//                }
+//            }
+//        });
+//
+//        playerThread.start();
+//        isPlaying = true;
+//        isPaused = false;
+//
+//        // Reiniciar el temporizador
+//        if (!timer.isRunning()) {
+//            timer.start();
+//        }
+//    } else {
+//        System.out.println("No hay música en pausa para reanudar.");
+//    }
+//}
+
+
+ public void pauseMusic() {
+    System.out.println("*************************");
+    System.out.println("Entrando en pauseMusic()");
+    System.out.println("Estado inicial: ");
+    System.out.println("  isPlaying: " + isPlaying);
+    System.out.println("  isPaused: " + isPaused);
+    System.out.println("  player : " + player);
+    System.out.println("  currentFrame : " + currentFrame);
+    System.out.println("  pausedOnFrame : " + pausedOnFrame);
+    System.out.println("  playerThread: " + playerThread);
+    System.out.println("  playerThread.isAlive(): " + (playerThread != null && playerThread.isAlive()));
+
+    if (player != null && isPlaying && !isPaused) {
+        isPaused = true;
+        isPlaying = false;
+
+        try {
+            pausedOnFrame = currentFrame;
+            player.close(); // Cierra el reproductor
+            playerThread.join(); // Espera a que el hilo del reproductor termine
+
+            // Guarda el frame actual donde se pausó la reproducción
+            System.out.println("La música se pausó en: " + pausedOnFrame);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Detener el temporizador cuando la música está en pausa
+        if (timer.isRunning()) {
+            timer.stop();
+        }
+        System.out.println("Música pausada correctamente");
+    }
+}
+
+  public void stopMusic() {
         if (player != null && isPlaying) {
-             player.close();
+            // Detener el reproductor y restablecer estados
+            player.close();
             isPlaying = false;
             isPaused = false;
             pausedOnFrame = 0;
             currentTimeInSeconds = 0;
-            // Stop the timer when music stops
+
+            // Detener el temporizador si está en ejecución
             if (timer.isRunning()) {
                 timer.stop();
             }
@@ -202,8 +353,7 @@ public class MusicPlayer {
     public void updatePlaybackTime(int currentTime, int totalTime) {
         String formattedCurrentTime = formatTime(currentTime);
         String formattedTotalTime = formatTime(totalTime);
-        System.out.println("Tiempo actual: " + formattedCurrentTime);
-        System.out.println("Duración total: " + formattedTotalTime);
+       
     }
     
     public String getFormattedTotalTime() {
@@ -217,5 +367,11 @@ public class MusicPlayer {
     public int getTotalTimeInSeconds() {
         return totalTimeInSeconds;
     }
+
+    public void setPaused(boolean paused) {
+        this.isPaused = paused;
+    }
+    
+    
 
 }

@@ -43,6 +43,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         stateButton = new javax.swing.JButton();
         currentTimeLabel = new javax.swing.JLabel();
         totalTimeLabel = new javax.swing.JLabel();
+        resumeButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -89,6 +90,13 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
 
         totalTimeLabel.setText("Duración total: 0 s");
 
+        resumeButton.setText("Continuar");
+        resumeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resumeButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -99,10 +107,12 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(playButton)
                         .addGap(18, 18, 18)
+                        .addComponent(resumeButton)
+                        .addGap(18, 18, 18)
                         .addComponent(pauseButton)
                         .addGap(18, 18, 18)
                         .addComponent(stopButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 251, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(loadButton))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(songLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 369, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -110,7 +120,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(currentTimeLabel)
                             .addComponent(totalTimeLabel))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 93, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -134,7 +144,8 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                     .addComponent(playButton)
                     .addComponent(stopButton)
                     .addComponent(loadButton)
-                    .addComponent(pauseButton))
+                    .addComponent(pauseButton)
+                    .addComponent(resumeButton))
                 .addGap(16, 16, 16))
         );
 
@@ -154,7 +165,8 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
 
       
     private void playButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playButtonActionPerformed
-       if (!musicPlayer.getMusicFileName().equals("No hay ninguna canción cargada")) {
+       
+        if (!musicPlayer.getMusicFileName().equals("No hay ninguna canción cargada")) {
             musicPlayer.playMusic();
             songLabel.setText("Reproduciendo: " + musicPlayer.getMusicFileName());
             stateButton.setText("Reproduciendo");
@@ -169,6 +181,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
             });
              // Actualizar las etiquetas de tiempo actual y duración total
              updateCurrentTimeLabelTimer.start();
+             musicPlayer.setPaused(false); 
         } else {
             JOptionPane.showMessageDialog(this, "Por favor, cargue un archivo primero.");
         }
@@ -218,6 +231,12 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         
     }//GEN-LAST:event_pauseButtonActionPerformed
 
+    private void resumeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resumeButtonActionPerformed
+        musicPlayer.resumeMusic();
+        songLabel.setText("Reproduciendo: " + musicPlayer.getMusicFileName());
+        stateButton.setText("Reproduciendo");
+    }//GEN-LAST:event_resumeButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -260,6 +279,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private javax.swing.JButton loadButton;
     private javax.swing.JButton pauseButton;
     private javax.swing.JButton playButton;
+    private javax.swing.JButton resumeButton;
     private javax.swing.JLabel songLabel;
     private javax.swing.JButton stateButton;
     private javax.swing.JButton stopButton;
