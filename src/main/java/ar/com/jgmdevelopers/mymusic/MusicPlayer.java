@@ -38,7 +38,6 @@ public class MusicPlayer implements BasicPlayerListener {
         this.player = new BasicPlayer();
         this.player.addBasicPlayerListener(this);
         this.playerThread = null;
-       
         this.bitrate = "";
         this.sampleRate = "";
 
@@ -107,6 +106,7 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
     if (!timer.isRunning()) {
+        System.out.println("times no esta corriendo, entra al start");
         timer.start();
     }
 
@@ -133,15 +133,17 @@ public class MusicPlayer implements BasicPlayerListener {
 
                 player.play();
                 player.setGain(0.85); 
+//                if (timer.isRunning()) {
+//                    System.out.println("times esta corriendo, entra al stop");
+//                    timer.stop();
+//                }
                 
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 System.out.println("entro en la finally");
                 //isPlaying = false;
-                if (timer.isRunning()) {
-                    timer.stop();
-                }
+                
             }
         });
 
@@ -187,6 +189,7 @@ public class MusicPlayer implements BasicPlayerListener {
                 playerThread.join(); // Espera a que el hilo del reproductor termine
 
                 if (timer.isRunning()) {
+                    System.out.println("times esta corriendo, entra al stop");
                     timer.stop();
                 }
             } catch (InterruptedException e) {
@@ -211,6 +214,7 @@ public class MusicPlayer implements BasicPlayerListener {
             pausedOnFrame = 0;
             currentTimeInSeconds = 0;
             if (timer.isRunning()) {
+                System.out.println("times esta corriendo, entra al stop");
                 timer.stop();
             }
         }
@@ -277,7 +281,6 @@ public class MusicPlayer implements BasicPlayerListener {
     public void progress(int bytesread, long microseconds, byte[] pcmdata, Map properties) {
         // Optional: Implement if needed
     }
-
     @Override
     public void stateUpdated(BasicPlayerEvent event) {
         if (event.getCode() == BasicPlayerEvent.EOM) {
@@ -287,10 +290,10 @@ public class MusicPlayer implements BasicPlayerListener {
                 Logger.getLogger(MusicPlayer.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else if (event.getCode() == BasicPlayerEvent.PAUSED) {
-            currentFrame = (int) event.getPosition(); // Actualizar el frame actual
-            pausedOnFrame = currentFrame; // Actualizar el frame pausado
+            currentFrame = (int) event.getPosition();
+            pausedOnFrame = currentFrame;
         } else if (event.getCode() == BasicPlayerEvent.RESUMED) {
-            currentFrame = (int) event.getPosition(); // Actualizar el frame actual
+            currentFrame = (int) event.getPosition();
         }
     }
 

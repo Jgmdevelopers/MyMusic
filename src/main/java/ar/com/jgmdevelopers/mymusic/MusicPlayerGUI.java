@@ -17,11 +17,19 @@ import javazoom.jlgui.basicplayer.BasicPlayerException;
 public class MusicPlayerGUI extends javax.swing.JFrame {
 
     private MusicPlayer musicPlayer = new MusicPlayer();
+    private Timer updateCurrentTimeLabelTimer;
 
     
     public MusicPlayerGUI() {
         initComponents();
          musicPlayer = new MusicPlayer();
+         updateCurrentTimeLabelTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String formattedCurrentTime = musicPlayer.formatTime(musicPlayer.getCurrentPlaybackTime());
+                currentTimeLabel.setText("Tiempo actual: " + formattedCurrentTime);
+            }
+        });
     }
 
     /**
@@ -170,17 +178,9 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
             songLabel.setText("Reproduciendo: " + musicPlayer.getMusicFileName());
             stateButton.setText("Reproduciendo");
             
-            //Creo un timer para actualizar el currentimelabel cada segundo
-            Timer updateCurrentTimeLabelTimer = new Timer (1000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String formattedCurrentTime = musicPlayer.formatTime(musicPlayer.getCurrentPlaybackTime());
-                    currentTimeLabel.setText("Tiempo actual: " + formattedCurrentTime);
-                }
-            });
-             // Actualizar las etiquetas de tiempo actual y duración total
-             updateCurrentTimeLabelTimer.start();
-             musicPlayer.setPaused(false); 
+            // Actualizar las etiquetas de tiempo actual y duración total
+            updateCurrentTimeLabelTimer.start();
+            musicPlayer.setPaused(false);
         } else {
             JOptionPane.showMessageDialog(this, "Por favor, cargue un archivo primero.");
         }
@@ -189,6 +189,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
         try {
             musicPlayer.stopMusic();
+            updateCurrentTimeLabelTimer.stop();
         } catch (BasicPlayerException ex) {
             Logger.getLogger(MusicPlayerGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -234,6 +235,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pauseButtonActionPerformed
         try {
             musicPlayer.pauseMusic();
+             updateCurrentTimeLabelTimer.stop();
             songLabel.setText("Pausado: " + musicPlayer.getMusicFileName());
             stateButton.setText("Pausado");
         } catch (BasicPlayerException ex) {
@@ -247,6 +249,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         musicPlayer.resumeMusic();
         songLabel.setText("Reproduciendo: " + musicPlayer.getMusicFileName());
         stateButton.setText("Reproduciendo");
+          updateCurrentTimeLabelTimer.start();
     }//GEN-LAST:event_resumeButtonActionPerformed
 
     /**
