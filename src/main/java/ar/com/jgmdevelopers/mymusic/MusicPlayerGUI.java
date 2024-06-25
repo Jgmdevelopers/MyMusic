@@ -1,15 +1,14 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package ar.com.jgmdevelopers.mymusic;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
+import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 /**
  *
@@ -188,7 +187,11 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_playButtonActionPerformed
 
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
-        musicPlayer.stopMusic();
+        try {
+            musicPlayer.stopMusic();
+        } catch (BasicPlayerException ex) {
+            Logger.getLogger(MusicPlayerGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
         songLabel.setText("Detenido: " + musicPlayer.getMusicFileName());
         stateButton.setText("Detenido");
     }//GEN-LAST:event_stopButtonActionPerformed
@@ -199,8 +202,12 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File musicFile = fileChooser.getSelectedFile();
             
-            // Detener la reproducción actual antes de cargar el nuevo archivo
-            musicPlayer.stopMusic();
+           try {
+               // Detener la reproducción actual antes de cargar el nuevo archivo
+               musicPlayer.stopMusic();
+           } catch (BasicPlayerException ex) {
+               Logger.getLogger(MusicPlayerGUI.class.getName()).log(Level.SEVERE, null, ex);
+           }
 
             musicPlayer.loadMusic(musicFile);
 
@@ -225,9 +232,14 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_stateButtonActionPerformed
 
     private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pauseButtonActionPerformed
-        musicPlayer.pauseMusic();
-        songLabel.setText("Pausado: " + musicPlayer.getMusicFileName());
-        stateButton.setText("Pausado");
+        try {
+            musicPlayer.pauseMusic();
+            songLabel.setText("Pausado: " + musicPlayer.getMusicFileName());
+            stateButton.setText("Pausado");
+        } catch (BasicPlayerException ex) {
+            Logger.getLogger(MusicPlayerGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         
     }//GEN-LAST:event_pauseButtonActionPerformed
 
