@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JProgressBar;
 import javax.swing.Timer;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.BitstreamException;
@@ -32,14 +33,17 @@ public class MusicPlayer implements BasicPlayerListener {
     private String sampleRate;
     private Timer timer;
     private int currentFrame = 0;
+    private JProgressBar progressBar;
+    
 
-    public MusicPlayer() {
+    public MusicPlayer(JProgressBar progressBar) {
         this.musicFile = null;
         this.player = new BasicPlayer();
         this.player.addBasicPlayerListener(this);
         this.playerThread = null;
         this.bitrate = "";
         this.sampleRate = "";
+        this.progressBar = progressBar;
 
         // Initialize the timer
         timer = new Timer(1000, new ActionListener() {
@@ -48,6 +52,7 @@ public class MusicPlayer implements BasicPlayerListener {
                 if (isPlaying && !isPaused) {
                     currentTimeInSeconds++;
                     updatePlaybackTime(currentTimeInSeconds, totalTimeInSeconds);
+                    updateProgressBar(currentTimeInSeconds, totalTimeInSeconds);
                 }
             }
         });
@@ -59,6 +64,8 @@ public class MusicPlayer implements BasicPlayerListener {
         totalFrames = 0;
         bitrate = "";
         sampleRate = "";
+        currentTimeInSeconds = 0;  // Reset current time
+        updateProgressBar(0, 0);   // Reset progress bar
 
         try (FileInputStream fileInputStream = new FileInputStream(musicFile)) {
             Bitstream bitstream = new Bitstream(fileInputStream);
@@ -77,6 +84,7 @@ public class MusicPlayer implements BasicPlayerListener {
             }
 
             totalTimeInSeconds = totalDurationMillis / 1000;
+            updateProgressBar(0, totalTimeInSeconds);
             bitstream.close();
         } catch (IOException | BitstreamException e) {
             e.printStackTrace();
@@ -86,10 +94,7 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
   public void playMusic() {
-    System.out.println("Ingresa el metodo playMusic");
-    System.out.println("isPaused: " + isPaused);
-    System.out.println("isPlaying: " + isPlaying);
-    System.out.println("musicFile: " + (musicFile != null ? musicFile.getName() : "null"));
+  
 
     if (musicFile == null) {
         throw new IllegalStateException("No music file loaded");
@@ -104,60 +109,40 @@ public class MusicPlayer implements BasicPlayerListener {
     } else {
         startPlayer(pausedOnFrame);
     }
-
+    
     if (!timer.isRunning()) {
-        System.out.println("times no esta corriendo, entra al start");
+      
         timer.start();
     }
-
-    System.out.println("playMusic - Fin");
+    
 }
 
 
     private void startPlayer(int startFrame) {
-        System.out.println("Ingresa al metodo startPlayer");
-        System.out.println("startFrame: " + startFrame);
 
         playerThread = new Thread(() -> {
             try {
                 player.open(musicFile);
-                System.out.println("Abriendo el archivo..." + musicFile);
                 isPlaying = true;
-                System.out.println("isPlaying: " + isPlaying);
-                System.out.println("isPaused: " + isPaused);
 
                 if (startFrame > 0) {
-                    System.out.println("Reanudando desde el frame: " + startFrame);
                     player.seek(startFrame);
                 }
 
                 player.play();
                 player.setGain(0.85); 
-//                if (timer.isRunning()) {
-//                    System.out.println("times esta corriendo, entra al stop");
-//                    timer.stop();
-//                }
-                
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                System.out.println("entro en la finally");
-                //isPlaying = false;
                 
             }
         });
 
         playerThread.start();
 
-        System.out.println("startPlayer - Fin");
-      
     }
 
     public void resumeMusic() {
-        System.out.println("Ingresa al metodo resumeMusic");
-        System.out.println("isPaused: " + isPaused);
-          System.out.println("pausedOnFrame: " + pausedOnFrame);
-
+        
         if (isPaused) {
             startPlayer(pausedOnFrame); // Reanudar desde el frame pausado
             isPlaying = true;
@@ -167,18 +152,10 @@ public class MusicPlayer implements BasicPlayerListener {
                 timer.start();
             }
         }
-
-        System.out.println("resumeMusic - Fin");
-        System.out.println("isPlaying: " + isPlaying);
-        System.out.println("isPaused: " + isPaused);
     }
 
     public void pauseMusic() throws BasicPlayerException {
-        System.out.println("Ingreso al pauseMusic");
-        System.out.println("isPlaying: " + isPlaying);
-        System.out.println("isPaused: " + isPaused);
-        System.out.println("player: " + player);
-
+        
         if (player != null && isPlaying && !isPaused) {
             isPaused = true;
             isPlaying = false;
@@ -189,7 +166,6 @@ public class MusicPlayer implements BasicPlayerListener {
                 playerThread.join(); // Espera a que el hilo del reproductor termine
 
                 if (timer.isRunning()) {
-                    System.out.println("times esta corriendo, entra al stop");
                     timer.stop();
                 }
             } catch (InterruptedException e) {
@@ -197,31 +173,21 @@ public class MusicPlayer implements BasicPlayerListener {
             }
         }
 
-        System.out.println("pauseMusic - Fin");
-        System.out.println("pausedOnFrame: " + pausedOnFrame);
-        System.out.println("isPlaying: " + isPlaying);
-        System.out.println("isPaused: " + isPaused);
     }
 
     public void stopMusic() throws BasicPlayerException {
-        System.out.println("stopMusic - Inicio");
-        System.out.println("isPlaying: " + isPlaying);
-
+     
         if (player != null && isPlaying) {
             player.stop();
             isPlaying = false;
             isPaused = false;
             pausedOnFrame = 0;
             currentTimeInSeconds = 0;
+            updateProgressBar(0, totalTimeInSeconds);  // resetea la barra de progreso
             if (timer.isRunning()) {
-                System.out.println("times esta corriendo, entra al stop");
                 timer.stop();
             }
         }
-
-        System.out.println("stopMusic - Fin");
-        System.out.println("isPlaying: " + isPlaying);
-        System.out.println("isPaused: " + isPaused);
     }
 
     public boolean isPaused() {
@@ -252,7 +218,7 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
     public void updatePlaybackTime(int currentTime, int totalTime) {
-        String formattedCurrentTime = formatTime(currentTime);
+         String formattedCurrentTime = formatTime(currentTime);
         String formattedTotalTime = formatTime(totalTime);
     }
 
@@ -301,5 +267,13 @@ public class MusicPlayer implements BasicPlayerListener {
     @Override
     public void setController(BasicController controller) {
         // Optional: Implement if needed
+    }
+    
+     public void updateProgressBar(int currentTimeInSeconds, int totalTimeInSeconds) {
+        if (progressBar != null) {
+            double progress = (double) currentTimeInSeconds / totalTimeInSeconds;
+            int percentage = (int) (progress * 100);
+            progressBar.setValue(percentage);
+        }
     }
 }

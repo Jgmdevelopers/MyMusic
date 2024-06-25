@@ -16,22 +16,28 @@ import javazoom.jlgui.basicplayer.BasicPlayerException;
  */
 public class MusicPlayerGUI extends javax.swing.JFrame {
 
-    private MusicPlayer musicPlayer = new MusicPlayer();
+     private MusicPlayer musicPlayer;
     private Timer updateCurrentTimeLabelTimer;
 
     
     public MusicPlayerGUI() {
         initComponents();
-         musicPlayer = new MusicPlayer();
-         updateCurrentTimeLabelTimer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String formattedCurrentTime = musicPlayer.formatTime(musicPlayer.getCurrentPlaybackTime());
-                currentTimeLabel.setText("Tiempo actual: " + formattedCurrentTime);
-            }
-        });
-    }
+         musicPlayer = new MusicPlayer(progressBar); // Pasa la JProgressBar aquí
+         progressBar = new javax.swing.JProgressBar();
+            updateCurrentTimeLabelTimer = new Timer(1000, new ActionListener() {
+                      @Override
+                      public void actionPerformed(ActionEvent e) {
+                          int currentTime = musicPlayer.getCurrentPlaybackTime();
+                          int totalTime = musicPlayer.getTotalTimeInSeconds();
 
+                          String formattedCurrentTime = musicPlayer.formatTime(currentTime);
+                          currentTimeLabel.setText("Tiempo actual: " + formattedCurrentTime);
+
+                          // Actualizar la barra de progreso
+                          musicPlayer.updateProgressBar(currentTime, totalTime);
+                      }
+                  });
+              }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -41,7 +47,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        fondo = new javax.swing.JPanel();
         playButton = new javax.swing.JButton();
         stopButton = new javax.swing.JButton();
         loadButton = new javax.swing.JButton();
@@ -51,11 +57,12 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         currentTimeLabel = new javax.swing.JLabel();
         totalTimeLabel = new javax.swing.JLabel();
         resumeButton = new javax.swing.JButton();
+        progressBar = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(204, 204, 204));
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        fondo.setBackground(new java.awt.Color(255, 255, 255));
+        fondo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         playButton.setText("Play");
         playButton.addActionListener(new java.awt.event.ActionListener() {
@@ -104,14 +111,21 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        progressBar.setStringPainted(true);
+
+        javax.swing.GroupLayout fondoLayout = new javax.swing.GroupLayout(fondo);
+        fondo.setLayout(fondoLayout);
+        fondoLayout.setHorizontalGroup(
+            fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(fondoLayout.createSequentialGroup()
+                .addContainerGap(497, Short.MAX_VALUE)
+                .addComponent(stateButton)
+                .addGap(18, 18, 18))
+            .addGroup(fondoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(fondoLayout.createSequentialGroup()
                         .addComponent(playButton)
                         .addGap(18, 18, 18)
                         .addComponent(resumeButton)
@@ -121,33 +135,31 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                         .addComponent(stopButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(loadButton))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGroup(fondoLayout.createSequentialGroup()
                         .addComponent(songLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 369, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(currentTimeLabel)
                             .addComponent(totalTimeLabel))
-                        .addGap(0, 93, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(stateButton)
-                .addGap(18, 18, 18))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+        fondoLayout.setVerticalGroup(
+            fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, fondoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(stateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(117, 117, 117)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(songLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGroup(fondoLayout.createSequentialGroup()
                         .addComponent(currentTimeLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(totalTimeLabel)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 137, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 105, Short.MAX_VALUE)
+                .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(playButton)
                     .addComponent(stopButton)
                     .addComponent(loadButton)
@@ -160,11 +172,11 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(fondo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(fondo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -174,7 +186,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private void playButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playButtonActionPerformed
        
         if (!musicPlayer.getMusicFileName().equals("No hay ninguna canción cargada")) {
-            musicPlayer.playMusic();
+            musicPlayer.playMusic(); // Pasa la JProgressBar aquí
             songLabel.setText("Reproduciendo: " + musicPlayer.getMusicFileName());
             stateButton.setText("Reproduciendo");
             
@@ -290,10 +302,11 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel currentTimeLabel;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel fondo;
     private javax.swing.JButton loadButton;
     private javax.swing.JButton pauseButton;
     private javax.swing.JButton playButton;
+    private javax.swing.JProgressBar progressBar;
     private javax.swing.JButton resumeButton;
     private javax.swing.JLabel songLabel;
     private javax.swing.JButton stateButton;
