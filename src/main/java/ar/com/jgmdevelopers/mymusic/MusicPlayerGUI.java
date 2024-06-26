@@ -1,12 +1,17 @@
 package ar.com.jgmdevelopers.mymusic;
 
+import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 import javazoom.jlgui.basicplayer.BasicPlayerException;
 
@@ -18,10 +23,16 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
 
      private MusicPlayer musicPlayer;
     private Timer updateCurrentTimeLabelTimer;
+    FondoPanel fondoPanel;
 
     
     public MusicPlayerGUI() {
         initComponents();
+      // Configura el diseño del JFrame para que el FondoPanel ocupe todo el espacio
+    getContentPane().setLayout(new BorderLayout());
+    fondoPanel = new FondoPanel();
+    getContentPane().add(fondoPanel, BorderLayout.CENTER);
+    
          musicPlayer = new MusicPlayer(progressBar); // Pasa la JProgressBar aquí
          progressBar = new javax.swing.JProgressBar();
             updateCurrentTimeLabelTimer = new Timer(1000, new ActionListener() {
@@ -316,4 +327,27 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
 
    
  
+
+class FondoPanel extends JPanel {
+    private Image imagen;
+
+    public FondoPanel() {
+        try {
+            imagen = new ImageIcon(getClass().getResource("/uno.jpg")).getImage();
+            setOpaque(false); // Hace que el panel sea transparente
+        } catch (NullPointerException e) {
+            // Manejar la excepción si la imagen no puede ser cargada
+            System.err.println("No se pudo cargar la imagen de fondo: " + e.getMessage());
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (imagen != null) {
+            // Dibuja la imagen de fondo ajustada al tamaño del panel
+            g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
+}
 }
