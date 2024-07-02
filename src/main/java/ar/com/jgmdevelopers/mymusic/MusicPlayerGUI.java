@@ -5,15 +5,25 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.Timer;
 import javazoom.jlgui.basicplayer.BasicPlayerException;
+import javax.swing.table.DefaultTableModel;
+import java.util.Map;
+import java.util.List;
+
 
 /**
  *
@@ -69,6 +79,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         totalTimeLabel = new javax.swing.JLabel();
         resumeButton = new javax.swing.JButton();
         progressBar = new javax.swing.JProgressBar();
+        btnMostPlayed = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -124,6 +135,13 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
 
         progressBar.setStringPainted(true);
 
+        btnMostPlayed.setText("Mi Top");
+        btnMostPlayed.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMostPlayedActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout fondoLayout = new javax.swing.GroupLayout(fondo);
         fondo.setLayout(fondoLayout);
         fondoLayout.setHorizontalGroup(
@@ -153,7 +171,9 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, fondoLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(stateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnMostPlayed)
+                    .addComponent(stateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18))
         );
         fondoLayout.setVerticalGroup(
@@ -162,7 +182,9 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(stateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(songLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(songLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnMostPlayed))
                 .addGap(18, 18, 18)
                 .addGroup(fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -280,6 +302,10 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
           updateCurrentTimeLabelTimer.start();
     }//GEN-LAST:event_resumeButtonActionPerformed
 
+    private void btnMostPlayedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostPlayedActionPerformed
+      showMostPlayedSongs();
+    }//GEN-LAST:event_btnMostPlayedActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -317,6 +343,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnMostPlayed;
     private javax.swing.JLabel currentTimeLabel;
     private javax.swing.JPanel fondo;
     private javax.swing.JButton loadButton;
@@ -355,4 +382,79 @@ class FondoPanel extends JPanel {
         }
     }
 }
+
+private void showMostPlayedSongs() {
+    List<Map<String, Object>> mostPlayedSongs = musicPlayer.getMostPlayedSongs();
+    String[] columnNames = {"Título", "Artista", "Reproducciones"};
+    DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false; // Deshabilitar la edición de las celdas
+        }
+    };
+
+    for (Map<String, Object> song : mostPlayedSongs) {
+        Object[] row = {song.get("title"), song.get("artist"), song.get("play_count")};
+        model.addRow(row);
+    }
+
+    JTable table = new JTable(model);
+    table.addMouseListener(new MouseAdapter() {
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                int row = table.getSelectedRow();
+                String title = table.getValueAt(row, 0).toString();
+                String artist = table.getValueAt(row, 1).toString();
+                System.out.println("Double click detected on: " + title + " by " + artist); // Depuración
+                playSelectedSong(title, artist);
+            }
+        }
+    });
+
+    JScrollPane scrollPane = new JScrollPane(table);
+    JFrame frame = new JFrame("Canciones Más Escuchadas");
+    frame.add(scrollPane);
+    frame.setSize(400, 300);
+    frame.setLocationRelativeTo(null);
+    frame.setVisible(true);
+}
+
+private void playSelectedSong(String title, String artist) {
+    System.out.println("Attempting to play song: " + title + " by " + artist); // Depuración
+
+    // Obtener la ruta del archivo desde la base de datos
+    String filePath = musicPlayer.getSongFilePath(title, artist);
+    System.out.println("File path: " + filePath); // Depuración
+
+    if (filePath != null) {
+        File musicFile = new File(filePath);
+        try {
+            musicPlayer.stopMusic();
+            musicPlayer.loadMusic(musicFile);
+            musicPlayer.playMusic();
+            songLabel.setText("Reproduciendo: " + musicPlayer.getMusicFileName());
+            stateButton.setText("Reproduciendo");
+            updateCurrentTimeLabelTimer.start();
+            musicPlayer.setPaused(false);
+            
+            
+            closeMostPlayedSongsWindow();
+        } catch (BasicPlayerException ex) {
+            Logger.getLogger(MusicPlayerGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "No se pudo encontrar la canción en la base de datos.");
+    }
+}
+
+private void closeMostPlayedSongsWindow() {
+    JFrame frame = new JFrame("Canciones Más Escuchadas");
+    frame.dispose(); // Cierra la ventana
+}
+
+
+
+
+
+
 }

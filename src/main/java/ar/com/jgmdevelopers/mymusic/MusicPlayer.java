@@ -5,10 +5,16 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +34,7 @@ public class MusicPlayer implements BasicPlayerListener {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/music_library";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "";
+    private static final String DEFAULT_DIRECTORY = "C:/Mymusic/";
     
     private File musicFile;
     private BasicPlayer player;
@@ -43,6 +50,7 @@ public class MusicPlayer implements BasicPlayerListener {
     private Timer timer;
     private int currentFrame = 0;
     private JProgressBar progressBar;
+    private String musicFileName = "No hay ninguna canción cargada";
     
 
     public MusicPlayer(JProgressBar progressBar) {
@@ -98,6 +106,8 @@ public class MusicPlayer implements BasicPlayerListener {
             
             // Insertar la canción en la base de datos
             insertSongIntoDatabase(musicFile.getName(), "Artista Desconocido", totalTimeInSeconds, musicFile.getAbsolutePath());
+            
+            
         } catch (IOException | BitstreamException e) {
             e.printStackTrace();
         }
@@ -105,20 +115,93 @@ public class MusicPlayer implements BasicPlayerListener {
       
     }
     
-     private void insertSongIntoDatabase(String title, String artist, int duration, String filePath) {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+   private void insertSongIntoDatabase(String title, String artist, int duration, String filePath) {
+    try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+        String selectSQL = "SELECT id, play_count FROM songs WHERE title = ? AND artist = ? AND duration = ? AND file_path = ?";
+        PreparedStatement selectStmt = conn.prepareStatement(selectSQL);
+        selectStmt.setString(1, title);
+        selectStmt.setString(2, artist);
+        selectStmt.setInt(3, duration);
+        selectStmt.setString(4, filePath);
+        ResultSet rs = selectStmt.executeQuery();
+
+        if (rs.next()) {
+            int id = rs.getInt("id");
+            int playCount = rs.getInt("play_count");
+
+            String updateSQL = "UPDATE songs SET play_count = ? WHERE id = ?";
+            PreparedStatement updateStmt = conn.prepareStatement(updateSQL);
+            updateStmt.setInt(1, playCount + 1);
+            updateStmt.setInt(2, id);
+            updateStmt.executeUpdate();
+            System.out.println("Canción ya existente, incremento del contador de reproducciones.");
+        } else {
             String insertSQL = "INSERT INTO songs (title, artist, duration, file_path) VALUES (?, ?, ?, ?)";
-            PreparedStatement statement = conn.prepareStatement(insertSQL);
+            PreparedStatement insertStmt = conn.prepareStatement(insertSQL);
+            insertStmt.setString(1, title);
+            insertStmt.setString(2, artist);
+            insertStmt.setInt(3, duration);
+            insertStmt.setString(4, filePath);
+            insertStmt.executeUpdate();
+            System.out.println("Nueva canción insertada en la base de datos.");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+     
+   public List<Map<String, Object>> getMostPlayedSongs() {
+    List<Map<String, Object>> mostPlayedSongs = new ArrayList<>();
+    try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+        String querySQL = "SELECT title, artist, play_count FROM songs ORDER BY play_count DESC";
+        PreparedStatement stmt = conn.prepareStatement(querySQL);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            Map<String, Object> songData = Map.of(
+                "title", rs.getString("title"),
+                "artist", rs.getString("artist"),
+                "play_count", rs.getInt("play_count")
+            );
+            mostPlayedSongs.add(songData);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return mostPlayedSongs;
+}
+    public String getSongFilePath(String title, String artist) {
+        String filePath = null;
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT file_path FROM songs WHERE title = ? AND artist = ?";
+            PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, title);
             statement.setString(2, artist);
-            statement.setInt(3, duration);
-            statement.setString(4, filePath);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                filePath = resultSet.getString("file_path");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return filePath;
+    }
+
+    public void incrementPlayCount(String title, String artist) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "UPDATE songs SET play_count = play_count + 1 WHERE title = ? AND artist = ?";
+            PreparedStatement statement = conn.prepareStatement(query);
+            statement.setString(1, title);
+            statement.setString(2, artist);
             statement.executeUpdate();
-            System.out.println("Canción insertada correctamente en la base de datos.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
+
+      
+ 
 
   public void playMusic() {
   
