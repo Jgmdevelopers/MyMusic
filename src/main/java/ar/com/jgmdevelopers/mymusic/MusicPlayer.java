@@ -5,6 +5,10 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +24,11 @@ import javazoom.jlgui.basicplayer.BasicPlayerException;
 import javazoom.jlgui.basicplayer.BasicPlayerListener;
 
 public class MusicPlayer implements BasicPlayerListener {
+    
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/music_library";
+    private static final String DB_USER = "root";
+    private static final String DB_PASSWORD = "";
+    
     private File musicFile;
     private BasicPlayer player;
     private Thread playerThread;
@@ -86,11 +95,29 @@ public class MusicPlayer implements BasicPlayerListener {
             totalTimeInSeconds = totalDurationMillis / 1000;
             updateProgressBar(0, totalTimeInSeconds);
             bitstream.close();
+            
+            // Insertar la canción en la base de datos
+            insertSongIntoDatabase(musicFile.getName(), "Artista Desconocido", totalTimeInSeconds, musicFile.getAbsolutePath());
         } catch (IOException | BitstreamException e) {
             e.printStackTrace();
         }
 
       
+    }
+    
+     private void insertSongIntoDatabase(String title, String artist, int duration, String filePath) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String insertSQL = "INSERT INTO songs (title, artist, duration, file_path) VALUES (?, ?, ?, ?)";
+            PreparedStatement statement = conn.prepareStatement(insertSQL);
+            statement.setString(1, title);
+            statement.setString(2, artist);
+            statement.setInt(3, duration);
+            statement.setString(4, filePath);
+            statement.executeUpdate();
+            System.out.println("Canción insertada correctamente en la base de datos.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
   public void playMusic() {
