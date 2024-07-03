@@ -70,7 +70,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private void initComponents() {
 
         fondo = new javax.swing.JPanel();
-        songLabel = new javax.swing.JLabel();
+        //songLabel = new javax.swing.JLabel();
         stateButton = new javax.swing.JButton();
         btnMostPlayed = new javax.swing.JButton();
         playButton = new javax.swing.JButton();
