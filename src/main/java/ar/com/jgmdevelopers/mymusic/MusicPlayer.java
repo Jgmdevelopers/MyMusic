@@ -5,9 +5,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -62,7 +59,7 @@ public class MusicPlayer implements BasicPlayerListener {
         this.sampleRate = "";
         this.progressBar = progressBar;
 
-        // Initialize the timer
+        // contador
         timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -76,7 +73,7 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
     public void loadMusic(File file) {
-
+        System.out.println("dentro del load");
         this.musicFile = file;
         totalFrames = 0;
         bitrate = "";
@@ -99,7 +96,7 @@ public class MusicPlayer implements BasicPlayerListener {
                 totalDurationMillis += header.ms_per_frame();
 
             }
-
+          
             totalTimeInSeconds = totalDurationMillis / 1000;
             updateProgressBar(0, totalTimeInSeconds);
             bitstream.close();
@@ -115,6 +112,7 @@ public class MusicPlayer implements BasicPlayerListener {
 
     }
 
+    
     private void insertSongIntoDatabase(String title, String artist, int duration, String filePath) {
     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
         String selectSQL = "SELECT id, play_count FROM songs WHERE title = ? AND artist = ? AND duration = ? AND file_path = ?";
@@ -151,6 +149,7 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
     public List<Map<String, Object>> getMostPlayedSongs() {
+    System.out.println("Obteniendo las canciones más reproducidas.");
     List<Map<String, Object>> mostPlayedSongs = new ArrayList<>();
     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
         String querySQL = "SELECT title, artist, play_count FROM songs ORDER BY play_count DESC";
@@ -172,6 +171,7 @@ public class MusicPlayer implements BasicPlayerListener {
     }
     
     public String getSongFilePath(String title, String artist) {
+        System.out.println("Obteniendo la ruta del archivo para la canción: " + title);
         String filePath = null;
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "SELECT file_path FROM songs WHERE title = ? AND artist = ?";
@@ -189,6 +189,7 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
     public void incrementPlayCount(String title, String artist) {
+        System.out.println("Incrementando el contador de reproducciones para la canción: " + title);
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String query = "UPDATE songs SET play_count = play_count + 1 WHERE title = ? AND artist = ?";
             PreparedStatement statement = conn.prepareStatement(query);
@@ -201,8 +202,8 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
     public void playMusic() {
-  
-
+    System.out.println("Reproduciendo música.");
+   
     if (musicFile == null) {
         throw new IllegalStateException("No music file loaded");
     }
@@ -225,7 +226,7 @@ public class MusicPlayer implements BasicPlayerListener {
 }
 
     private void startPlayer(int startFrame) {
-
+    System.out.println("Iniciando reproductor desde el frame: " + startFrame);
         playerThread = new Thread(() -> {
             try {
                 player.open(musicFile);
@@ -248,7 +249,7 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
     public void resumeMusic() {
-        
+    System.out.println("Reanudando música.");
         if (isPaused) {
             startPlayer(pausedOnFrame); // Reanudar desde el frame pausado
             isPlaying = true;
@@ -261,7 +262,7 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
     public void pauseMusic() throws BasicPlayerException {
-        
+        System.out.println("Pausando música.");
         if (player != null && isPlaying && !isPaused) {
             isPaused = true;
             isPlaying = false;
@@ -282,17 +283,17 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
     public void stopMusic() throws BasicPlayerException {
-     
-        if (player != null && isPlaying) {
+    System.out.println("Deteniendo música.");
+    if (player != null && isPlaying) {
             player.stop();
             isPlaying = false;
             isPaused = false;
             pausedOnFrame = 0;
             currentTimeInSeconds = 0;
             updateProgressBar(0, totalTimeInSeconds);  // resetea la barra de progreso
-            if (timer.isRunning()) {
-                timer.stop();
-            }
+                if (timer.isRunning()) {
+                    timer.stop();
+                }
         }
     }
 
@@ -324,8 +325,9 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
     public void updatePlaybackTime(int currentTime, int totalTime) {
-         String formattedCurrentTime = formatTime(currentTime);
+        String formattedCurrentTime = formatTime(currentTime);
         String formattedTotalTime = formatTime(totalTime);
+        System.out.println("Tiempo de reproducción: " + formattedCurrentTime + " / " + formattedTotalTime);
     }
 
     public String getFormattedTotalTime() {

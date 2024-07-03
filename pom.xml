@@ -3,15 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>ar.com.jgmDevelopers</groupId>
     <artifactId>MyMusic</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
+
     <dependencies>
         <!-- Dependencia de JLayer -->
         <dependency>
@@ -19,22 +22,22 @@
             <artifactId>jlayer</artifactId>
             <version>1.0.1</version>
         </dependency>
+        
+        <!-- Dependencia de MySQL Connector -->
         <dependency>
-	<groupId>com.mpatric</groupId>
-	<artifactId>mp3agic</artifactId>
-	<version>0.9.0</version>
-</dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.28</version> <!-- O la última versión disponible -->
+        </dependency>
+
+        <!-- Dependencia de BasicPlayer -->
         <dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-    <version>8.0.28</version> <!-- O la última versión disponible -->
-</dependency>
-       <dependency>
-    <groupId>javazoom</groupId>
-    <artifactId>basicplayer</artifactId>
-    <version>3.0.0.0</version>
-</dependency>
+            <groupId>javazoom</groupId>
+            <artifactId>basicplayer</artifactId>
+            <version>3.0.0.0</version>
+        </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
