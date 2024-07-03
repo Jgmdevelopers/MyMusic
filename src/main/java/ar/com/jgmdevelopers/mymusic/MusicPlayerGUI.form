@@ -52,12 +52,12 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="32767" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="stateButton" alignment="1" min="-2" pref="22" max="-2" attributes="0"/>
-                  <Group type="103" alignment="1" groupAlignment="3" attributes="0">
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="loadButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="btnMostPlayed" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
+                  <Component id="stateButton" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="fondo" min="-2" max="-2" attributes="0"/>
@@ -92,32 +92,27 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="songLabel" min="-2" pref="400" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
-              </Group>
+              <Component id="songLabel" alignment="0" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="songLabel" min="-2" pref="24" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
-              </Group>
+              <Component id="songLabel" alignment="0" pref="36" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
         <Component class="javax.swing.JLabel" name="songLabel">
           <Properties>
-            <Property name="text" type="java.lang.String" value="No hay ninguna canci&#xf3;n cargada"/>
+            <Property name="text" type="java.lang.String" value="No hay canciones cargadas"/>
           </Properties>
         </Component>
       </SubComponents>
     </Container>
     <Component class="javax.swing.JButton" name="stateButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Estado"/>
+      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="stateButtonActionPerformed"/>
       </Events>
@@ -181,7 +176,7 @@
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="progressBar" min="-2" pref="234" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="totalTimeLabel" max="32767" attributes="0"/>
+                  <Component id="totalTimeLabel" pref="73" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
