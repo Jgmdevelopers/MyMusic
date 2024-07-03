@@ -434,7 +434,11 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         JFrame frame = new JFrame("Canciones Más Escuchadas");
         frame.add(scrollPane);
         frame.setSize(400, 300);
-        frame.setLocationRelativeTo(null);
+       // Obtener la posición de la ventana principal y colocar la nueva ventana a la derecha
+        int x = this.getX() + this.getWidth();
+        int y = this.getY();
+        frame.setLocation(x, y);
+
         frame.setVisible(true);
     }
 
