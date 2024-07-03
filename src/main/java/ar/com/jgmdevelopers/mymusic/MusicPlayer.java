@@ -76,13 +76,13 @@ public class MusicPlayer implements BasicPlayerListener {
     }
 
     public void loadMusic(File file) {
-      
+
         this.musicFile = file;
         totalFrames = 0;
         bitrate = "";
         sampleRate = "";
-        currentTimeInSeconds = 0;  // Reset current time
-        updateProgressBar(0, 0);   // Reset progress bar
+        currentTimeInSeconds = 0;  // reseteo el tiempo de reproduccion
+        updateProgressBar(0, 0);   // reseteo la barra
 
         try (FileInputStream fileInputStream = new FileInputStream(musicFile)) {
             Bitstream bitstream = new Bitstream(fileInputStream);
@@ -97,25 +97,25 @@ public class MusicPlayer implements BasicPlayerListener {
                 totalFrames++;
                 bitstream.closeFrame();
                 totalDurationMillis += header.ms_per_frame();
-               
+
             }
 
             totalTimeInSeconds = totalDurationMillis / 1000;
             updateProgressBar(0, totalTimeInSeconds);
             bitstream.close();
-            
+
             // Insertar la canción en la base de datos
             insertSongIntoDatabase(musicFile.getName(), "Artista Desconocido", totalTimeInSeconds, musicFile.getAbsolutePath());
-            
-            
+
+
         } catch (IOException | BitstreamException e) {
             e.printStackTrace();
         }
 
-      
+
     }
-    
-   private void insertSongIntoDatabase(String title, String artist, int duration, String filePath) {
+
+    private void insertSongIntoDatabase(String title, String artist, int duration, String filePath) {
     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
         String selectSQL = "SELECT id, play_count FROM songs WHERE title = ? AND artist = ? AND duration = ? AND file_path = ?";
         PreparedStatement selectStmt = conn.prepareStatement(selectSQL);
@@ -148,9 +148,9 @@ public class MusicPlayer implements BasicPlayerListener {
     } catch (SQLException e) {
         e.printStackTrace();
     }
-}
-     
-   public List<Map<String, Object>> getMostPlayedSongs() {
+    }
+
+    public List<Map<String, Object>> getMostPlayedSongs() {
     List<Map<String, Object>> mostPlayedSongs = new ArrayList<>();
     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
         String querySQL = "SELECT title, artist, play_count FROM songs ORDER BY play_count DESC";
@@ -169,7 +169,8 @@ public class MusicPlayer implements BasicPlayerListener {
         e.printStackTrace();
     }
     return mostPlayedSongs;
-}
+    }
+    
     public String getSongFilePath(String title, String artist) {
         String filePath = null;
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
@@ -199,11 +200,7 @@ public class MusicPlayer implements BasicPlayerListener {
         }
     }
 
-
-      
- 
-
-  public void playMusic() {
+    public void playMusic() {
   
 
     if (musicFile == null) {
@@ -226,7 +223,6 @@ public class MusicPlayer implements BasicPlayerListener {
     }
     
 }
-
 
     private void startPlayer(int startFrame) {
 
@@ -373,13 +369,12 @@ public class MusicPlayer implements BasicPlayerListener {
         }
     }
 
-
     @Override
     public void setController(BasicController controller) {
         // Optional: Implement if needed
     }
     
-     public void updateProgressBar(int currentTimeInSeconds, int totalTimeInSeconds) {
+    public void updateProgressBar(int currentTimeInSeconds, int totalTimeInSeconds) {
         if (progressBar != null) {
             double progress = (double) currentTimeInSeconds / totalTimeInSeconds;
             int percentage = (int) (progress * 100);
