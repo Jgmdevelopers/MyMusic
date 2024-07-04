@@ -1,21 +1,24 @@
 # Aplicación de Reproductor de Música
 
-Esta es una aplicación de reproductor de música basada en Java que permite a los usuarios reproducir archivos de música, ver metadatos y gestionar listas de reproducción.
+Este proyecto es una aplicación de reproductor de música creada en Java utilizando `BasicPlayer` para la reproducción de archivos MP3 y una base de datos MySQL para almacenar y gestionar las canciones.
 
 ## Características
 
-- Reproduce archivos de música en varios formatos.
-- Muestra metadatos como bitrate y sample rate.
-- Gestiona listas de reproducción.
-- Realiza un seguimiento de las canciones más reproducidas.
+- Reproducción de archivos MP3.
+- Pausar, reanudar y detener la reproducción.
+- Mostrar el tiempo de reproducción actual y total.
+- Actualizar y mostrar la barra de progreso de la canción.
+- Almacenar y gestionar canciones en una base de datos MySQL.
+- Incrementar el contador de reproducciones de las canciones.
+- Listar y reproducir las canciones más reproducidas.
 
 ## Capturas de Pantalla
 
 ### Interfaz del Reproductor de Música
-![Reproductor de Música](src/main/java/resources/rep.png)
+![Reproductor de Música](screenshots/reproductor_de_musica.png)
 
 ### Reproductor de Música con Lista de Reproducción
-![Reproductor de Música con Lista de Reproducción](src/main/java/resources/rep2.png)
+![Reproductor de Música con Lista de Reproducción](screenshots/reproductor_con_lista_de_reproduccion.png)
 
 ## Tecnologías Utilizadas
 
