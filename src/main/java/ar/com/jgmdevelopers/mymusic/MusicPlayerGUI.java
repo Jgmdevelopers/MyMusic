@@ -34,6 +34,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private MusicPlayer musicPlayer;
     private Timer updateCurrentTimeLabelTimer;
     FondoPanel fondoPanel;
+    private JFrame mostPlayedFrame;
 
     public MusicPlayerGUI() {
         initComponents();
@@ -93,19 +94,10 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         fondo.setBackground(new java.awt.Color(255, 255, 255));
         fondo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         fondo.setName(""); // NOI18N
+        fondo.setLayout(new java.awt.BorderLayout());
 
         songLabel.setText("No hay canciones cargadas");
-
-        javax.swing.GroupLayout fondoLayout = new javax.swing.GroupLayout(fondo);
-        fondo.setLayout(fondoLayout);
-        fondoLayout.setHorizontalGroup(
-            fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(songLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        fondoLayout.setVerticalGroup(
-            fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(songLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-        );
+        fondo.add(songLabel, java.awt.BorderLayout.CENTER);
 
         stateButton.setText("Estado");
         stateButton.addActionListener(new java.awt.event.ActionListener() {
@@ -395,9 +387,24 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
             }
         }
     }
-
+    
+    // Método para mostrar las canciones más escuchadas
     private void showMostPlayedSongs() {
-        List<Map<String, Object>> mostPlayedSongs = musicPlayer.getMostPlayedSongs();
+        System.out.println("dentro del metodo showMostPlayedSongs.");
+        System.out.println("mostPlayedFrame es: " +mostPlayedFrame);
+
+       List<Map<String, Object>> mostPlayedSongs = musicPlayer.getMostPlayedSongs();
+        musicPlayer.loadPlaylist(mostPlayedSongs);
+        
+        if (mostPlayedFrame != null && mostPlayedFrame.isVisible()) {
+            System.out.println("entro al ");
+            mostPlayedFrame.setVisible(false); // Ocultar la ventana si está visible
+            mostPlayedFrame.dispose(); // Asegurarte de que la ventana se cierra completamente
+            mostPlayedFrame = null; // Limpiar la referencia a la ventana
+          return;
+         }
+
+        //List<Map<String, Object>> mostPlayedSongs = musicPlayer.getMostPlayedSongs();
         String[] columnNames = {"Título", "Artista", "Reproducciones"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -423,17 +430,16 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                 }
             }
         });
-
         JScrollPane scrollPane = new JScrollPane(table);
-        JFrame frame = new JFrame("Canciones Más Escuchadas");
-        frame.add(scrollPane);
-        frame.setSize(400, 300);
-       // Obtener la posición de la ventana principal y colocar la nueva ventana a la derecha
-        int x = this.getX() + this.getWidth();
-        int y = this.getY();
-        frame.setLocation(x, y);
+           mostPlayedFrame = new JFrame("Canciones Más Escuchadas");
+           mostPlayedFrame.add(scrollPane);
+           mostPlayedFrame.setSize(400, 300);
+           // Obtener la posición de la ventana principal y colocar la nueva ventana a la derecha
+           int x = this.getX() + this.getWidth();
+           int y = this.getY();
+           mostPlayedFrame.setLocation(x, y);
 
-        frame.setVisible(true);
+           mostPlayedFrame.setVisible(true);
     }
 
     private void playSelectedSong(String title, String artist) {
@@ -456,6 +462,10 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                 
                 // Actualizar la etiqueta de tiempo total
                 totalTimeLabel.setText(musicPlayer.getFormattedTotalTime() + " s");
+                   // Cerrar la ventana de canciones más reproducidas
+                if (mostPlayedFrame != null) {
+                    mostPlayedFrame.setVisible(false);
+                }
 
                 closeMostPlayedSongsWindow();
             } catch (BasicPlayerException ex) {

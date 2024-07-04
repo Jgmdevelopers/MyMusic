@@ -1,7 +1,7 @@
 ar\com\jgmdevelopers\mymusic\MusicPlayerGUI$2.class
 ar\com\jgmdevelopers\mymusic\MusicPlayerGUI$8.class
 ar\com\jgmdevelopers\mymusic\MusicPlayerGUI$11.class
-ar\com\jgmdevelopers\mymusic\ScrollingLabel.class
+ar\com\jgmdevelopers\mymusic\components\ScrollingLabel.class
 ar\com\jgmdevelopers\mymusic\MusicPlayerGUI$9.class
 ar\com\jgmdevelopers\mymusic\MusicPlayerGUI$7.class
 ar\com\jgmdevelopers\mymusic\MusicPlayerGUI$10.class
@@ -12,7 +12,7 @@ ar\com\jgmdevelopers\mymusic\MusicPlayerGUI$6.class
 ar\com\jgmdevelopers\mymusic\MusicPlayerGUI$5.class
 ar\com\jgmdevelopers\mymusic\MusicPlayerGUI.class
 ar\com\jgmdevelopers\mymusic\MusicPlayer.class
-ar\com\jgmdevelopers\mymusic\ScrollingLabel$1.class
+ar\com\jgmdevelopers\mymusic\components\ScrollingLabel$1.class
 ar\com\jgmdevelopers\mymusic\MusicPlayerGUI$3.class
 ar\com\jgmdevelopers\mymusic\MusicPlayerGUI$4.class
 ar\com\jgmdevelopers\mymusic\MusicPlayer$1.class

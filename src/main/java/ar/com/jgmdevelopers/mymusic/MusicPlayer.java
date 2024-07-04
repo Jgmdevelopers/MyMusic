@@ -48,9 +48,12 @@ public class MusicPlayer implements BasicPlayerListener {
     private int currentFrame = 0;
     private JProgressBar progressBar;
     private String musicFileName = "No hay ninguna canción cargada";
+    private List<Map<String, Object>> playlist;
+    private int currentSongIndex; //indice para rastrear la cancion actual
     
 
     public MusicPlayer(JProgressBar progressBar) {
+        this.playlist = new ArrayList<>();
         this.musicFile = null;
         this.player = new BasicPlayer();
         this.player.addBasicPlayerListener(this);
@@ -58,6 +61,7 @@ public class MusicPlayer implements BasicPlayerListener {
         this.bitrate = "";
         this.sampleRate = "";
         this.progressBar = progressBar;
+        this.currentSongIndex = -1; // Inicializa con -1 indicando que no hay canción seleccionada
 
         // contador
         timer = new Timer(1000, new ActionListener() {
@@ -112,6 +116,12 @@ public class MusicPlayer implements BasicPlayerListener {
 
     }
 
+    //cargar la lista de reproduccion
+    public void loadPlaylist(List<Map<String, Object>> mostPlayedSongs) {
+    this.playlist.clear();
+    this.playlist.addAll(mostPlayedSongs);
+    this.currentSongIndex = 0; // Empieza con la primera canción
+}
     
     private void insertSongIntoDatabase(String title, String artist, int duration, String filePath) {
     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
@@ -225,6 +235,26 @@ public class MusicPlayer implements BasicPlayerListener {
     
 }
 
+    public void playCurrentSong() {
+    if (currentSongIndex >= 0 && currentSongIndex < playlist.size()) {
+        Map<String, Object> song = playlist.get(currentSongIndex);
+        String title = (String) song.get("title");
+        String artist = (String) song.get("artist");
+        String filePath = getSongFilePath(title, artist);
+
+        if (filePath != null) {
+            File musicFile = new File(filePath);
+            loadMusic(musicFile);
+            playMusic();
+        } else {
+            System.out.println("No se pudo encontrar la canción: " + title);
+        }
+    } else {
+        System.out.println("Índice de canción inválido: " + currentSongIndex);
+    }
+}
+
+    
     private void startPlayer(int startFrame) {
     System.out.println("Iniciando reproductor desde el frame: " + startFrame);
         playerThread = new Thread(() -> {
@@ -327,7 +357,7 @@ public class MusicPlayer implements BasicPlayerListener {
     public void updatePlaybackTime(int currentTime, int totalTime) {
         String formattedCurrentTime = formatTime(currentTime);
         String formattedTotalTime = formatTime(totalTime);
-        System.out.println("Tiempo de reproducción: " + formattedCurrentTime + " / " + formattedTotalTime);
+        //System.out.println("Tiempo de reproducción: " + formattedCurrentTime + " / " + formattedTotalTime);
     }
 
     public String getFormattedTotalTime() {
@@ -355,21 +385,28 @@ public class MusicPlayer implements BasicPlayerListener {
     public void progress(int bytesread, long microseconds, byte[] pcmdata, Map properties) {
         // Optional: Implement if needed
     }
-    @Override
-    public void stateUpdated(BasicPlayerEvent event) {
-        if (event.getCode() == BasicPlayerEvent.EOM) {
-            try {
-                stopMusic();
-            } catch (BasicPlayerException ex) {
-                Logger.getLogger(MusicPlayer.class.getName()).log(Level.SEVERE, null, ex);
+  @Override
+public void stateUpdated(BasicPlayerEvent event) {
+    if (event.getCode() == BasicPlayerEvent.EOM) {
+        try {
+            stopMusic();
+            currentSongIndex++;
+            if (currentSongIndex < playlist.size()) {
+                playCurrentSong();
+            } else {
+                System.out.println("La lista de reproducción ha terminado.");
             }
-        } else if (event.getCode() == BasicPlayerEvent.PAUSED) {
-            currentFrame = (int) event.getPosition();
-            pausedOnFrame = currentFrame;
-        } else if (event.getCode() == BasicPlayerEvent.RESUMED) {
-            currentFrame = (int) event.getPosition();
+        } catch (BasicPlayerException ex) {
+            Logger.getLogger(MusicPlayer.class.getName()).log(Level.SEVERE, null, ex);
         }
+    } else if (event.getCode() == BasicPlayerEvent.PAUSED) {
+        currentFrame = (int) event.getPosition();
+        pausedOnFrame = currentFrame;
+    } else if (event.getCode() == BasicPlayerEvent.RESUMED) {
+        currentFrame = (int) event.getPosition();
     }
+    
+}
 
     @Override
     public void setController(BasicController controller) {
