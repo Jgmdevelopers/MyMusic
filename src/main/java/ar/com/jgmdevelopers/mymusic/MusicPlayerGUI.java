@@ -87,6 +87,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         progressBar = new javax.swing.JProgressBar();
         currentTimeLabel = new javax.swing.JLabel();
         totalTimeLabel = new javax.swing.JLabel();
+        info = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -170,6 +171,13 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
 
         totalTimeLabel.setText("0 s");
 
+        info.setText("Info");
+        info.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                infoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -198,6 +206,8 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(9, 9, 9)
                                 .addComponent(stateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(info)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnMostPlayed)
                                 .addGap(18, 18, 18)
@@ -213,7 +223,8 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadButton)
                     .addComponent(btnMostPlayed)
-                    .addComponent(stateButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(stateButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(info))
                 .addGap(30, 30, 30)
                 .addComponent(fondo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -326,6 +337,21 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_songLabelComponentAdded
 
+    private void infoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_infoActionPerformed
+   // Crear el mensaje a mostrar con HTML para hacer el enlace clickeable
+    String message = "<html>" +
+                     "<body>" +
+                     "<p>Proyecto creado para el curso de Java Avanzado, dictado por el municipio de 3 de Febrero<br>" +
+                     "Creado por Jorge Gabriel Molina.<br>" +
+                     "Mail : gabrielmolina.ush@gmail.com<br>" +
+                     "Repositorio: <a href=\"https://github.com/Jgmdevelopers/MyMusic\">https://github.com/Jgmdevelopers/MyMusic</a></p>" +
+                     "</body>" +
+                     "</html>";
+
+    // Mostrar el mensaje como un JOptionPane
+    JOptionPane.showMessageDialog(this, message, "Información del Proyecto", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_infoActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -366,6 +392,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private javax.swing.JButton btnMostPlayed;
     private javax.swing.JLabel currentTimeLabel;
     private javax.swing.JPanel fondo;
+    private javax.swing.JButton info;
     private javax.swing.JButton loadButton;
     private javax.swing.JButton pauseButton;
     private javax.swing.JButton playButton;
