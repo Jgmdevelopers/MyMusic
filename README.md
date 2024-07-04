@@ -15,10 +15,10 @@ Este proyecto es una aplicación de reproductor de música creada en Java utiliz
 ## Capturas de Pantalla
 
 ### Interfaz del Reproductor de Música
-![Reproductor de Música](screenshots/reproductor_de_musica.png)
+![Reproductor de Música](src/main/java/resources/rep.png)
 
 ### Reproductor de Música con Lista de Reproducción
-![Reproductor de Música con Lista de Reproducción](screenshots/reproductor_con_lista_de_reproduccion.png)
+![Reproductor de Música con Lista de Reproducción](src/main/java/resources/rep2.png)
 
 ## Tecnologías Utilizadas
 
