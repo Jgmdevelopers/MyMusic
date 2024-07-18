@@ -32,6 +32,7 @@ import java.util.List;
 public class MusicPlayerGUI extends javax.swing.JFrame {
 
     private MusicPlayer musicPlayer;
+    private Playlist Playlist;
     private Timer updateCurrentTimeLabelTimer;
     FondoPanel fondoPanel;
     private JFrame mostPlayedFrame;
@@ -39,10 +40,10 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     public MusicPlayerGUI() {
         initComponents();
         setTitle("Proyecto Final - Java Avanzado - Gabriel Molina");
-        setSize(450, 220);
+        //setSize(450, 220);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(false);
+        //setResizable(false);
         
         // Configura el diseño del JFrame para que el FondoPanel ocupe todo el espacio
         getContentPane().setLayout(new BorderLayout());
@@ -76,7 +77,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        fondo = new javax.swing.JPanel();
+        fondo1 = new javax.swing.JPanel();
         songLabel = new javax.swing.JLabel();
         stateButton = new javax.swing.JButton();
         btnMostPlayed = new javax.swing.JButton();
@@ -89,6 +90,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         currentTimeLabel = new javax.swing.JLabel();
         totalTimeLabel = new javax.swing.JLabel();
         info = new javax.swing.JButton();
+        lista_btn = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -103,9 +105,9 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        fondo.setBackground(new java.awt.Color(255, 255, 255));
-        fondo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        fondo.setName(""); // NOI18N
+        fondo1.setBackground(new java.awt.Color(255, 255, 255));
+        fondo1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        fondo1.setName(""); // NOI18N
 
         songLabel.setText("No hay canciones cargadas");
         songLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -115,16 +117,16 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout fondoLayout = new javax.swing.GroupLayout(fondo);
-        fondo.setLayout(fondoLayout);
-        fondoLayout.setHorizontalGroup(
-            fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(fondoLayout.createSequentialGroup()
+        javax.swing.GroupLayout fondo1Layout = new javax.swing.GroupLayout(fondo1);
+        fondo1.setLayout(fondo1Layout);
+        fondo1Layout.setHorizontalGroup(
+            fondo1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(fondo1Layout.createSequentialGroup()
                 .addComponent(songLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 415, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
-        fondoLayout.setVerticalGroup(
-            fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        fondo1Layout.setVerticalGroup(
+            fondo1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(songLabel)
         );
 
@@ -190,6 +192,13 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
             }
         });
 
+        lista_btn.setText("Lista");
+        lista_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lista_btnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -214,31 +223,34 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(totalTimeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(9, 9, 9)
-                                .addComponent(stateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(info)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnMostPlayed)
-                                .addGap(18, 18, 18)
-                                .addComponent(loadButton))
-                            .addComponent(fondo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(fondo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 26, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(stateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(info)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnMostPlayed)
+                        .addGap(18, 18, 18)
+                        .addComponent(loadButton))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(lista_btn)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(9, Short.MAX_VALUE)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadButton)
                     .addComponent(btnMostPlayed)
                     .addComponent(stateButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(info))
-                .addGap(30, 30, 30)
-                .addComponent(fondo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lista_btn)
+                .addGap(26, 26, 26)
+                .addComponent(fondo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(currentTimeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
@@ -365,6 +377,10 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     JOptionPane.showMessageDialog(this, message, "Información del Proyecto", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_infoActionPerformed
 
+    private void lista_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lista_btnActionPerformed
+        Playlist.showPlayLists();
+    }//GEN-LAST:event_lista_btnActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -404,9 +420,10 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnMostPlayed;
     private javax.swing.JLabel currentTimeLabel;
-    private javax.swing.JPanel fondo;
+    private javax.swing.JPanel fondo1;
     private javax.swing.JButton info;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton lista_btn;
     private javax.swing.JButton loadButton;
     private javax.swing.JButton pauseButton;
     private javax.swing.JButton playButton;

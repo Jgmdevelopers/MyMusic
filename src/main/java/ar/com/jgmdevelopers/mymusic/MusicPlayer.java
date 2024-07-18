@@ -408,6 +408,10 @@ public void stateUpdated(BasicPlayerEvent event) {
     
 }
 
+ public boolean isPlaying() {
+        return isPlaying;
+    }
+ 
     @Override
     public void setController(BasicController controller) {
         // Optional: Implement if needed
