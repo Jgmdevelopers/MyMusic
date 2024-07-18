@@ -75,6 +75,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
         fondo = new javax.swing.JPanel();
         songLabel = new javax.swing.JLabel();
         stateButton = new javax.swing.JButton();
@@ -88,6 +89,17 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
         currentTimeLabel = new javax.swing.JLabel();
         totalTimeLabel = new javax.swing.JLabel();
         info = new javax.swing.JButton();
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -233,12 +245,13 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                     .addComponent(totalTimeLabel)
                     .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(playButton)
-                    .addComponent(resumeButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(pauseButton)
-                        .addComponent(stopButton)))
+                        .addComponent(stopButton))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(playButton)
+                        .addComponent(resumeButton)))
                 .addGap(9, 9, 9))
         );
 
@@ -393,6 +406,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private javax.swing.JLabel currentTimeLabel;
     private javax.swing.JPanel fondo;
     private javax.swing.JButton info;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JButton loadButton;
     private javax.swing.JButton pauseButton;
     private javax.swing.JButton playButton;
